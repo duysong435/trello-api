@@ -20,10 +20,9 @@ const createNew = async (req, res, next) => {
 
   })
   try {
-    // console.log(req.body)
     await correctCondition.validateAsync(req.body, { abortEarly: false })
-    // next()
-    res.status(StatusCodes.CREATED).json({ message: 'API v1 post board' })
+    // Validate dữ liệu hợp lệ chuyển sang controller
+    next()
   } catch (error) {
     // console.error(error)
     res.status(StatusCodes.UNPROCESSABLE_ENTITY).json({
