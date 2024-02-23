@@ -10,10 +10,10 @@ const createNew = async (reqBody) => {
     }
 
     const createBoard = await boardeModel.createNew(newBoard)
-    console.log('createBoardm', createBoard)
+    // console.log('createBoardm', createBoard)
 
     const getNewBoard = await boardeModel.findOneById(createBoard.insertedId)
-    console.log('getNewBoard', getNewBoard)
+    // console.log('getNewBoard', getNewBoard)
     return getNewBoard
   } catch (error) {
     throw error
