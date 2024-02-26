@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes'
 import ApiError from '~/utils/ApiError'
 import { BOARD_TYPES } from '~/utils/constants'
 
+
 const createNew = async (req, res, next) => {
   /**
    * Mặc định chúng ta không cần phải custom message ở phía BE làm gì vì để cho frontend tự validate và custom message phía BE cho đẹp
@@ -36,6 +37,31 @@ const createNew = async (req, res, next) => {
 
 }
 
+const update = async (req, res, next) => {
+  // Lưu ý không dùng hàm require() trong trường hợp update
+  const correctCondition = Joi.object({
+    title: Joi.string().min(3).max(50).trim().strict(),
+    description: Joi.string().min(3).max(256).trim().strict(),
+    type: Joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE)
+  })
+  try {
+    await correctCondition.validateAsync(req.body, {
+      abortEarly: false,
+      //  Đối với trường hợp update, cho phép Unknow để không cần đẩy một sô field lên
+      allowUnknown: true
+    })
+    // Validate dữ liệu hợp lệ chuyển sang controller
+    next()
+  } catch (error) {
+    // const errMessage = new Error(error).message
+    // const customError = new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, errMessage)
+    next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message))
+
+  }
+
+}
+
 export const boardValidation = {
-  createNew
+  createNew,
+  update
 }
