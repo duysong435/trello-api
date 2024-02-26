@@ -82,7 +82,30 @@ const getDetails = async (id) => {
       }
     ]).toArray()
     // console.log(result)
-    return result[0] || {}
+    return result[0] || null
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+// Nhiệm vụ của function này là cập nhật push 1 giá trị voà cuối mảng columnOrderIds
+const pushColumnOrderIds = async (column) => {
+  try {
+    const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
+      {
+        _id: new ObjectId(column.boardId)
+
+      },
+      {
+        $push: {
+          columnOrderIds: new ObjectId(column._id)
+        }
+      },
+      {
+        returnDocument: 'after'
+      }
+    )
+    return result.value || null
   } catch (error) {
     throw new Error(error)
   }
@@ -93,5 +116,6 @@ export const boardeModel = {
   BOARD_COLLECTION_SCHEMA,
   createNew,
   findOneById,
-  getDetails
+  getDetails,
+  pushColumnOrderIds
 }
