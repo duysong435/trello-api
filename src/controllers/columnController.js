@@ -8,7 +8,17 @@ const createNew = async (req, res, next) => {
     res.status(StatusCodes.CREATED).json(createColumn)
   } catch (error) { next(error) }
 }
+const update = async (req, res, next) => {
+  try {
+    // console.log(req.params)
+    const columnId = req.params.id
+    const updateColumn = await columnService.update(columnId, req.body)
+    // Có kết quả thì trả về phía client
 
+    res.status(StatusCodes.OK).json(updateColumn)
+  } catch (error) { next(error) }
+}
 export const columnController = {
-  createNew
+  createNew,
+  update
 }
