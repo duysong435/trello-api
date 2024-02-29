@@ -19,9 +19,16 @@ const START_SERVER = () => {
   // Middleware xử lý lỗi tập trung
   app.use(errorHandlingMiddleware)
 
-  app.listen(env.APP_PORT, env.APP_HOST, () => {
-    console.log(`App running at ${env.APP_HOST}:${env.APP_PORT}`)
-  })
+  if (env.BUILD_MODE === 'production') {
+    app.listen(process.env.PORT, env.APP_HOST, () => {
+      console.log(`App running at production ${process.env.PORT}`)
+    })
+  } else {
+    app.listen(env.APP_PORT, env.APP_HOST, () => {
+      console.log(`App running at ${env.APP_HOST}:${env.APP_PORT}`)
+    })
+
+  }
 
   // Thực hiên cleanUp server trước khi dừng lại
   exitHook((signal) => {
