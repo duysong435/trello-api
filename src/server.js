@@ -20,7 +20,7 @@ const START_SERVER = () => {
   app.use(errorHandlingMiddleware)
 
   if (env.BUILD_MODE === 'production') {
-    app.listen(process.env.PORT, env.APP_HOST, () => {
+    app.listen(process.env.PORT, () => {
       console.log(`App running at production ${process.env.PORT}`)
     })
   } else {
