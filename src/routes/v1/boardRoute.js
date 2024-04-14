@@ -3,8 +3,13 @@ import express from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { boardValidation } from '~/validations/boardValidation'
 import { boardController } from '~/controllers/boardController'
+import { authentication } from '~/utils/authUtils'
 
 const Router = express.Router()
+
+Router.use(authentication)
+
+Router.route('/get-all-board').get(boardController.getAllBoardForUser)
 
 Router.route('/')
   .get((req, res) => {
@@ -18,6 +23,5 @@ Router.route('/:id')
 Router.route('/supports/moving_card')
   .put(boardValidation.moveCardToDifferentColumn,
     boardController.moveCardToDifferentColumn)
-
 
 export const boardRoute = Router

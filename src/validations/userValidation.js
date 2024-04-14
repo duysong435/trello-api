@@ -24,6 +24,18 @@ const signUp = async (req, res, next) => {
     next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message))
   }
 }
+const login = async (req, res, next) => {
+  const correctCondition = Joi.object({
+    password: Joi.string().required().min(6).max(25).trim().strict(),
+    email: Joi.string().required().pattern(REGULAR_EMAIL).message(REGULAR_EMAIL_MESSAGE)
+  })
+  try {
+    await correctCondition.validateAsync(req.body, { abortEarly: false })
+    next()
+  } catch (error) {
+    next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message))
+  }
+}
 
 const update = async (req, res, next) => {
   // Lưu ý không dùng hàm require() trong trường hợp update
@@ -81,5 +93,6 @@ const moveCardToDifferentColumn = async (req, res, next) => {
 export const userValidation = {
   signUp,
   update,
-  moveCardToDifferentColumn
+  moveCardToDifferentColumn,
+  login
 }

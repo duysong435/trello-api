@@ -2,6 +2,7 @@
 
 import express from 'express'
 import cors from 'cors'
+import morgan from 'morgan'
 import { corsOptions } from './config/cors'
 import exitHook from 'async-exit-hook'
 import { CLOSE_DB, CONECT_DB } from './config/mongodb'
@@ -12,6 +13,7 @@ const START_SERVER = () => {
 
   const app = express()
   app.use(cors(corsOptions))
+  app.use(morgan('dev'))
 
   app.use(express.json())
   app.use('/v1', APIs_V1)

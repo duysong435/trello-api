@@ -12,8 +12,12 @@ const BOARD_COLLECTION_NAME = 'boards'
 const BOARD_COLLECTION_SCHEMA = Joi.object({
   title: Joi.string().required().min(3).max(50).trim().strict(),
   slug: Joi.string().required().min(3).trim().strict(),
-  description: Joi.string().required().min(3).max(256).trim().strict(),
-  type: Joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE).required(),
+  description: Joi.string().min(3).max(256).trim().strict().default(''),
+  type: Joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE).default('public'),
+  auth: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+  members: Joi.array().items(
+    Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
+  ).default([]),
 
   columnOrderIds: Joi.array().items(
     Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
@@ -33,6 +37,8 @@ const validateBeforeCreate = async (data) => {
 const createNew = async (data) => {
   try {
     const validata = await validateBeforeCreate(data)
+    validata.auth = new ObjectId(validata.auth)
+    validata.members[0] = new ObjectId(validata.members[0])
 
     const createBoard = await GET_DB().collection(BOARD_COLLECTION_NAME).insertOne(validata)
     return createBoard
@@ -168,6 +174,21 @@ const pullColumnOrderIds = async (column) => {
   }
 }
 
+const findAllBoardForUser = async (userId) => {
+  try {
+    const result = await GET_DB().collection(BOARD_COLLECTION_NAME).find(
+      {
+        auth: new ObjectId(userId),
+        members: { $in: [new ObjectId(userId)] }
+      }
+    ).toArray()
+    // console.log(result)
+    return result || null
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 
 export const boardeModel = {
   BOARD_COLLECTION_NAME,
@@ -177,5 +198,6 @@ export const boardeModel = {
   getDetails,
   pushColumnOrderIds,
   update,
-  pullColumnOrderIds
+  pullColumnOrderIds,
+  findAllBoardForUser
 }

@@ -20,8 +20,8 @@ const createNew = async (req, res, next) => {
       'string.max': 'Title min 256 character',
       'any.required': 'Title is require'
     }),
-    description: Joi.string().required().min(3).max(256).trim().strict(),
-    type: Joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE).required(),
+    // description: Joi.string().required().min(3).max(256).trim().strict(),
+    // type: Joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE).required(),
 
 
   })
