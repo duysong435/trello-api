@@ -6,13 +6,16 @@ import { StatusCodes } from 'http-status-codes'
 import { cloneDeep } from 'lodash'
 import { columnModel } from '~/models/columnModel'
 import { cardModel } from '~/models/cardModel'
+import { ObjectId } from 'mongodb'
 
 
-const createNew = async (reqBody) => {
+const createNew = async (user, reqBody) => {
   try {
     const newBoard = {
       ...reqBody,
-      slug: slugify(reqBody.title)
+      slug: slugify(reqBody.title),
+      auth: user.userId.toString(),
+      members: [user.userId.toString()]
     }
 
     const createBoard = await boardeModel.createNew(newBoard)
@@ -98,9 +101,23 @@ const moveCardToDifferentColumn = async (reqBody) => {
   }
 }
 
+const getAllBoardForUser = async (user) => {
+  try {
+
+    const board = await boardeModel.findAllBoardForUser(user.userId)
+    return {
+      code: StatusCodes.OK,
+      metadata: board
+    }
+  } catch (error) {
+    throw error
+  }
+}
+
 export const boardService = {
   createNew,
   getDetails,
   update,
-  moveCardToDifferentColumn
+  moveCardToDifferentColumn,
+  getAllBoardForUser
 }

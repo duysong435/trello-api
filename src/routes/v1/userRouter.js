@@ -10,7 +10,7 @@ const Router = express.Router()
 Router.route('/signup')
   .post(userValidation.signUp, userController.signUp)
 Router.route('/login')
-  .post(userValidation.signUp, userController.login)
+  .post(userValidation.login, userController.login)
 
 Router.use(authentication)
 

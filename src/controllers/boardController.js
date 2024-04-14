@@ -11,7 +11,7 @@ const createNew = async (req, res, next) => {
     // console.log(req.cookies)
     // console.log(req.jwtDecoded)
     //Điều hướng sang tầng service
-    const createBoard = await boardService.createNew(req.body)
+    const createBoard = await boardService.createNew(req.keyStore, req.body)
     // Có kết quả thì trả về phía client
 
     res.status(StatusCodes.CREATED).json(createBoard)
@@ -49,9 +49,18 @@ const moveCardToDifferentColumn = async (req, res, next) => {
   } catch (error) { next(error) }
 }
 
+const getAllBoardForUser = async (req, res, next) => {
+  try {
+    const result = await boardService.getAllBoardForUser(req.keyStore)
+
+    res.status(StatusCodes.OK).json(result)
+  } catch (error) { next(error) }
+}
+
 export const boardController = {
   createNew,
   getDetails,
   update,
-  moveCardToDifferentColumn
+  moveCardToDifferentColumn,
+  getAllBoardForUser
 }
