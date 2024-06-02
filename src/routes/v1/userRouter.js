@@ -1,22 +1,17 @@
+import express from "express";
+import { userValidation } from "~/validations/userValidation";
+import { userController } from "~/controllers/userController";
+import { authentication } from "~/utils/authUtils";
+const Router = express.Router();
 
-import express from 'express'
-import { StatusCodes } from 'http-status-codes'
-import { userValidation } from '~/validations/userValidation'
-import { userController } from '~/controllers/userController'
-import { authentication } from '~/utils/authUtils'
+Router.route("/signup").post(userValidation.signUp, userController.signUp);
+Router.route("/login").post(userValidation.login, userController.login);
 
-const Router = express.Router()
+// Router.use(authentication);
 
-Router.route('/signup')
-  .post(userValidation.signUp, userController.signUp)
-Router.route('/login')
-  .post(userValidation.login, userController.login)
+Router.route("/handlerRefreshToken").post(userController.handlerRefreshToken);
+Router.route("/logout").post(userController.logout);
 
-Router.use(authentication)
+//google auth sign in router
 
-Router.route('/handlerRefreshToken')
-  .post(userController.handlerRefreshToken)
-Router.route('/logout')
-  .post(userController.logout)
-
-export const userRouter = Router
+export const userRouter = Router;

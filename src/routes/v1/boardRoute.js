@@ -1,27 +1,27 @@
+import express from "express";
+import { StatusCodes } from "http-status-codes";
+import { boardValidation } from "~/validations/boardValidation";
+import { boardController } from "~/controllers/boardController";
+import { authentication } from "~/utils/authUtils";
 
-import express from 'express'
-import { StatusCodes } from 'http-status-codes'
-import { boardValidation } from '~/validations/boardValidation'
-import { boardController } from '~/controllers/boardController'
-import { authentication } from '~/utils/authUtils'
+const Router = express.Router();
 
-const Router = express.Router()
+Router.use(authentication);
 
-Router.use(authentication)
+Router.route("/get-all-board").get(boardController.getAllBoardForUser);
 
-Router.route('/get-all-board').get(boardController.getAllBoardForUser)
-
-Router.route('/')
+Router.route("/")
   .get((req, res) => {
-    res.status(StatusCodes.OK).json({ message: 'API v1 get board' })
+    res.status(StatusCodes.OK).json({ message: "API v1 get board" });
   })
-  .post(boardValidation.createNew, boardController.createNew)
+  .post(boardValidation.createNew, boardController.createNew);
 
-Router.route('/:id')
+Router.route("/:id")
   .get(boardController.getDetails)
-  .put(boardValidation.update, boardController.update)
-Router.route('/supports/moving_card')
-  .put(boardValidation.moveCardToDifferentColumn,
-    boardController.moveCardToDifferentColumn)
+  .put(boardValidation.update, boardController.update);
+Router.route("/supports/moving_card").put(
+  boardValidation.moveCardToDifferentColumn,
+  boardController.moveCardToDifferentColumn
+);
 
-export const boardRoute = Router
+export const boardRoute = Router;
