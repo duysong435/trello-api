@@ -20,11 +20,9 @@ const login = async (req, res, next) => {
 }
 const loginWithGoogle = async (req, res, next) => {
   try {
-    console.log(req.session.isNewUser)
     const createUser = await userService.loginWithGoogle(req.user, req.session)
     res.status(StatusCodes.CREATED).json(createUser)
   } catch (error) {
-    console.log(error)
     next(error)
   }
 }

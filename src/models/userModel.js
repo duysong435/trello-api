@@ -54,9 +54,11 @@ const findOrCreate = async (accessToken, refreshToken, profile, done) => {
       name: profile.displayName,
       email: profile.emails[0].value
     }
-    const result = await GET_DB().collection(USER_COLLECTION_NAME).insertOne(newUser)
+    const validata = await validateBeforeCreate(newUser)
+    const createUser = await GET_DB().collection(USER_COLLECTION_NAME).insertOne(validata)
+    // const result = await GET_DB().collection(USER_COLLECTION_NAME).insertOne(newUser)
 
-    const resultUser = await userModel.findOneById(result.insertedId)
+    const resultUser = await userModel.findOneById(createUser.insertedId)
     return done(null, resultUser, { isNewUser: true })
   } catch (err) {
     return done(err)

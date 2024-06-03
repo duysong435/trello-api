@@ -64,7 +64,7 @@ const signUp = async (reqBody) => {
 
 const login = async ({ email, user, password, refreshToken = null }) => {
   // 1.
-
+  if (!password) throw new ApiError(StatusCodes.UNAUTHORIZED, 'Authentication error')
   const foundUser = await userModel.findOneByEmail(email)
 
   if (!foundUser) throw new ApiError(StatusCodes.NOT_FOUND, 'Please register account!')
