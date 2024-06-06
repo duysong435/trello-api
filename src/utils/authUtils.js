@@ -7,7 +7,6 @@ const asyncHandler = require('./asyncHandler')
 const { keyTokenModel } = require('~/models/keyTokenModel')
 const { default: ApiError } = require('./ApiError')
 const { StatusCodes } = require('http-status-codes')
-
 const HEADER = {
   CLIENT_ID: 'x-client-id',
   AUTHORIZATION: 'authorization',
@@ -51,8 +50,7 @@ const authentication = asyncHandler(async (req, res, next) => {
   if (refreshToken) {
     try {
       const decodeUser = JWT.verify(refreshToken, keyStore.privateKey)
-      if (userId !== decodeUser.userId)
-        throw new ApiError(StatusCodes.UNAUTHORIZED, 'Invalid UserId')
+      if (userId !== decodeUser.userId) throw new ApiError(StatusCodes.UNAUTHORIZED, 'Invalid UserId')
       req.keyStore = keyStore
       req.user = decodeUser
       req.refreshToken = refreshToken
@@ -66,8 +64,7 @@ const authentication = asyncHandler(async (req, res, next) => {
 
   try {
     const decodeUser = JWT.verify(accessToken, keyStore.publicKey)
-    if (userId !== decodeUser.userId)
-      throw new ApiError(StatusCodes.UNAUTHORIZED, 'Invalid UserId')
+    if (userId !== decodeUser.userId) throw new ApiError(StatusCodes.UNAUTHORIZED, 'Invalid UserId')
     req.user = decodeUser
     req.keyStore = keyStore
     return next()

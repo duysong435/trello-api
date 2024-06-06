@@ -9,13 +9,26 @@ import { CLOSE_DB, CONECT_DB } from './config/mongodb'
 import { env } from './config/environment'
 import { APIs_V1 } from '~/routes/v1'
 import { errorHandlingMiddleware } from './middlewares/errorHandlingMiddleware'
+import session from 'express-session'
+import passport from 'passport'
+import passportGGAuth from '~/config/passportGGAuth'
 const START_SERVER = () => {
-
   const app = express()
+
   app.use(cors(corsOptions))
+  app.use(
+    session({
+      secret: 'secret',
+      resave: false,
+      saveUninitialized: false
+    })
+  )
+  app.use(passport.initialize())
+  app.use(passport.session())
   app.use(morgan('dev'))
 
   app.use(express.json())
+
   app.use('/v1', APIs_V1)
 
   // Middleware xử lý lỗi tập trung
@@ -29,7 +42,6 @@ const START_SERVER = () => {
     app.listen(env.APP_PORT, env.APP_HOST, () => {
       console.log(`App running at ${env.APP_HOST}:${env.APP_PORT}`)
     })
-
   }
 
   // Thực hiên cleanUp server trước khi dừng lại
@@ -40,7 +52,7 @@ const START_SERVER = () => {
 }
 
 // Chỉ khi kết nối tới Database thành công thì mới Start back-end lên
-(async () => {
+;(async () => {
   try {
     CONECT_DB()
     console.log('Connected to MongoDB Cloud Atlas!')

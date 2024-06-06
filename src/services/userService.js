@@ -9,7 +9,6 @@ import { createTokenPair } from '~/utils/authUtils'
 import { getInfoData } from '~/utils'
 import { keyTokenModel } from '~/models/keyTokenModel'
 
-
 const signUp = async (reqBody) => {
   try {
     const newUser = {
@@ -63,18 +62,16 @@ const signUp = async (reqBody) => {
   }
 }
 
-const login = async ({ email, password, refreshToken = null }) => {
-
+const login = async ({ email, user, password, refreshToken = null }) => {
   // 1.
+  if (!password) throw new ApiError(StatusCodes.UNAUTHORIZED, 'Authentication error')
   const foundUser = await userModel.findOneByEmail(email)
 
-  if (!foundUser)
-    throw new ApiError(StatusCodes.NOT_FOUND, 'Please register account!')
+  if (!foundUser) throw new ApiError(StatusCodes.NOT_FOUND, 'Please register account!')
 
   // 2.
   const match = bcrypt.compare(password, foundUser.password)
-  if (!match)
-    throw new ApiError(StatusCodes.UNAUTHORIZED, 'Authentication error')
+  if (!match) throw new ApiError(StatusCodes.UNAUTHORIZED, 'Authentication error')
 
   // 3.
   // created privateKey, publicKey
@@ -87,16 +84,52 @@ const login = async ({ email, password, refreshToken = null }) => {
 
   await KeyTokenService.createKeyToken({
     refreshToken: tokens.refreshToken,
-    privateKey, publicKey, userId
+    privateKey,
+    publicKey,
+    userId
   })
   return {
     code: StatusCodes.CREATED,
     metadata: {
-      user: getInfoData({ fields: ['_id', 'name', 'email'], object: foundUser }),
+      user: getInfoData({
+        fields: ['_id', 'name', 'email'],
+        object: foundUser
+      }),
       tokens
     }
   }
+}
 
+const loginWithGoogle = async ({ email }, { isNewUser }) => {
+  const foundUser = await userModel.findOneByEmail(email)
+  if (!foundUser) throw new ApiError(StatusCodes.NOT_FOUND, 'Please register account!')
+
+  // 2.
+  // created privateKey, publicKey
+  const privateKey = crypto.randomBytes(64).toString('hex')
+  const publicKey = crypto.randomBytes(64).toString('hex')
+
+  // 3. Generate tokens
+  const { _id: userId } = foundUser
+  const tokens = await createTokenPair({ userId, email }, publicKey, privateKey)
+
+  await KeyTokenService.createKeyToken({
+    refreshToken: tokens.refreshToken,
+    privateKey,
+    publicKey,
+    userId
+  })
+  return {
+    code: StatusCodes.CREATED,
+    metadata: {
+      user: getInfoData({
+        fields: ['_id', 'name', 'email'],
+        object: foundUser
+      }),
+      tokens,
+      isNewUser
+    }
+  }
 }
 
 const handlerRefreshToken = async ({ keyStore, user, refreshToken }) => {
@@ -112,10 +145,14 @@ const handlerRefreshToken = async ({ keyStore, user, refreshToken }) => {
 
   if (!foundShop) throw new ApiError(StatusCodes.UNAUTHORIZED, 'Shop not registered')
 
-  //create 1 cap moi 
+  //create 1 cap moi
   const tokens = await createTokenPair({ userId, email }, keyStore.publicKey, keyStore.privateKey)
 
-  await keyTokenModel.updateRefreshToken({ id: keyStore.userId, refreshToken: tokens.refreshToken, refreshTokenUsed: refreshToken })
+  await keyTokenModel.updateRefreshToken({
+    id: keyStore.userId,
+    refreshToken: tokens.refreshToken,
+    refreshTokenUsed: refreshToken
+  })
 
   return {
     user,
@@ -132,5 +169,6 @@ export const userService = {
   signUp,
   login,
   handlerRefreshToken,
-  logout
+  logout,
+  loginWithGoogle
 }
