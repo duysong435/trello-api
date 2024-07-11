@@ -12,7 +12,7 @@ const CARD_COLLECTION_SCHEMA = Joi.object({
   columnId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
 
   title: Joi.string().required().min(3).max(50).trim().strict(),
-  description: Joi.string().optional(),
+  description: Joi.string().default(''),
 
   createdAt: Joi.date().timestamp('javascript').default(Date.now),
   updatedAt: Joi.date().timestamp('javascript').default(null),
@@ -75,6 +75,7 @@ const update = async (cardId, updateData) => {
     if (updateData.columnId) {
       updateData.columnId = new ObjectId(updateData.columnId)
     }
+    updateData.updatedAt = new Date()
     const result = await GET_DB().collection(CARD_COLLECTION_NAME).findOneAndUpdate(
       {
         _id: new ObjectId(cardId)
@@ -92,11 +93,38 @@ const update = async (cardId, updateData) => {
     throw new Error(error)
   }
 }
+const updateCard = async (cardId, updateData) => {
+  try {
+    // Lọc những field mà chúng ta không cho phép cập nhật linh tinh
+    Object.keys(updateData).forEach(fieldName => {
+      if (INVALID_UPDATE_FIELDS.includes(fieldName)) {
+        delete updateData[fieldName]
+      }
+    })
+    // Đối với những dữ liệu liên quan objectId, biển đổi ở đây ( tuỳ sau này nếu cần thì tách function riềng)
+    if (updateData.columnId) {
+      updateData.columnId = new ObjectId(updateData.columnId)
+    }
+    const result = await GET_DB().collection(CARD_COLLECTION_NAME).updateOne(
+      {
+        _id: new ObjectId(cardId)
+
+      },
+      {
+        $set: updateData
+      }
+    )
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
 export const cardModel = {
   CARD_COLLECTION_NAME,
   CARD_COLLECTION_SCHEMA,
   createNew,
   findOneById,
   update,
-  deleteManyByColumnId
+  deleteManyByColumnId,
+  updateCard
 }

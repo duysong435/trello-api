@@ -4,3 +4,9 @@ export const BOARD_TYPES = {
   PUBLIC: 'public',
   PRIVATE: 'private'
 }
+
+export const HISTORY_TYPE = {
+  UPDATE: 'update',
+  DELETE: 'delete',
+  CREATE: 'create'
+}
