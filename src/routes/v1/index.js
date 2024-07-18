@@ -5,6 +5,8 @@ import { columnRoute } from './columnRoute'
 import { cardRoute } from './cardRoute'
 import { userRouter } from './userRouter'
 import { passportGGAuth } from './passportGGAuthRouter'
+import { uploadImage } from './upload'
+import { workspaceRoute } from './workspaceRoute'
 const Router = express.Router()
 
 Router.get('/status', (req, res) => {
@@ -16,5 +18,6 @@ Router.use('/columns', columnRoute)
 Router.use('/cards', cardRoute)
 Router.use('/user', userRouter)
 Router.use('/auth', passportGGAuth)
-
+Router.use('/upload', uploadImage)
+Router.use('/workspace', workspaceRoute)
 export const APIs_V1 = Router

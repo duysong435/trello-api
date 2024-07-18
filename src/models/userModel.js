@@ -6,6 +6,7 @@ import { REGULAR_EMAIL, REGULAR_EMAIL_MESSAGE } from '~/utils/validators'
 import { columnModel } from './columnModel'
 import { cardModel } from './cardModel'
 import { deleteFiled } from '~/utils'
+import { workspaceModel } from './workspaceModel'
 // import { result } from "lodash";
 
 // Define collection (Name & Schema)
@@ -34,7 +35,21 @@ const createNew = async (data) => {
     const validata = await validateBeforeCreate(data)
 
     const createUser = await GET_DB().collection(USER_COLLECTION_NAME).insertOne(validata)
+    const userId = createUser.insertedId
+    const workspaceData = {
+      auth: userId,
+      members: [userId],
+      title: 'Default Workspace',
+      description: 'This is your default workspace',
+      logo: 'https://res.cloudinary.com/dxdkr650j/image/upload/v1720858911/uploads/vp4xlkcxdb86qnyrodym.png',
+      boardIds: [],
+      createdAt: new Date(),
+      updateAt: null,
+      _destroy: false
+    }
 
+    // Gọi hàm createWorkspace để tạo workspace
+    await workspaceModel.createWorkspace(workspaceData)
     return createUser
   } catch (error) {
     throw new Error(error)

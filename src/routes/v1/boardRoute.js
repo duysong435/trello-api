@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes'
 import { boardValidation } from '~/validations/boardValidation'
 import { boardController } from '~/controllers/boardController'
 import { authentication } from '~/utils/authUtils'
-
+import { boardeModel } from '~/models/boardModel'
 const Router = express.Router()
 
 Router.use(authentication)
@@ -18,5 +18,5 @@ Router.route('/')
 
 Router.route('/:id').get(boardController.getDetails).put(boardValidation.update, boardController.update)
 Router.route('/supports/moving_card').put(boardValidation.moveCardToDifferentColumn, boardController.moveCardToDifferentColumn)
-
+Router.route('/getforworkspace/:id').get(boardController.getAllBoardForWorkspace)
 export const boardRoute = Router
