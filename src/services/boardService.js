@@ -8,7 +8,6 @@ import { columnModel } from '~/models/columnModel'
 import { cardModel } from '~/models/cardModel'
 import { ObjectId } from 'mongodb'
 
-
 const createNew = async (user, reqBody) => {
   try {
     const newBoard = {
@@ -31,7 +30,6 @@ const createNew = async (user, reqBody) => {
 
 const getDetails = async (boardId) => {
   try {
-
     const board = await boardeModel.getDetails(boardId)
     if (!board) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found!')
@@ -41,9 +39,9 @@ const getDetails = async (boardId) => {
 
     const resBoard = cloneDeep(board)
     // Đưa card về đúng  column của nó
-    resBoard.columns.forEach(column => {
+    resBoard.columns.forEach((column) => {
       // Cách dùng .equals này là bưởi vì chúng ta hiểu ObjectId trong mongoDb có support method .equals
-      column.cards = resBoard.cards.filter(card => card.columnId.equals(column._id.toString()))
+      column.cards = resBoard.cards.filter((card) => card.columnId.equals(column._id.toString()))
 
       // Câch khác đơn giản là convert ObejctId về string bằng hàm toString() của Javascript
       // column.cards = resBoard.cards.filter(card => card.columnId.toString() === column._id.toString())
@@ -74,12 +72,12 @@ const update = async (boardId, reqBody) => {
 const moveCardToDifferentColumn = async (reqBody) => {
   try {
     /**
-   * Khi di chuyển card sang column khác
-   * B1: Cập nhật mảng cardOrrderIds của column ban đầu chứa nó (Hiểu bản chất là xoá Card ra khỏi mảng)
-   * B2: Cập nhật mảng cardOrrderIds của column tiếp theo ( Hiểu bản chất là thêm id của card vao mảng)
-   * B3: Cập nhật lại trường columnId mới của cái card đã kéo
-   * ==> làm một API support riêng
-    */
+     * Khi di chuyển card sang column khác
+     * B1: Cập nhật mảng cardOrrderIds của column ban đầu chứa nó (Hiểu bản chất là xoá Card ra khỏi mảng)
+     * B2: Cập nhật mảng cardOrrderIds của column tiếp theo ( Hiểu bản chất là thêm id của card vao mảng)
+     * B3: Cập nhật lại trường columnId mới của cái card đã kéo
+     * ==> làm một API support riêng
+     */
     // B1
     await columnModel.update(reqBody.prevColumnId, {
       cardOrderIds: reqBody.prevCardOrderIds,
@@ -103,7 +101,6 @@ const moveCardToDifferentColumn = async (reqBody) => {
 
 const getAllBoardForUser = async (user) => {
   try {
-
     const board = await boardeModel.findAllBoardForUser(user.userId)
     return {
       code: StatusCodes.OK,

@@ -38,7 +38,6 @@ const signUp = async (reqBody) => {
         publicKey,
         privateKey
       })
-
       if (!keyStore) {
         return {
           code: 'xxxx',
