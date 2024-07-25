@@ -178,18 +178,41 @@ const pullColumnOrderIds = async (column) => {
 
 const findAllBoardForUser = async (userId) => {
   try {
-    const result = await GET_DB()
+    const db = await GET_DB()
+
+    // Lấy tất cả các board của user
+    const boards = await db
       .collection(BOARD_COLLECTION_NAME)
       .find({
         $or: [{ auth: new ObjectId(userId) }, { members: new ObjectId(userId) }]
       })
       .toArray()
-    // console.log(result)
-    return result || null
+    // Lấy tất cả các workspace của user
+    const workspaces = await db
+      .collection(workspaceModel.WORKSPACE_COLLECTION_NAME)
+      .find({
+        $or: [{ auth: new ObjectId(userId) }, { members: new ObjectId(userId) }]
+      })
+      .toArray()
+    // Kết hợp các boards vào các workspaces dựa trên workspaceId
+    const joinedWorkspaces = workspaces.map((workspace) => {
+      return {
+        ...workspace,
+        boards: boards.filter((board) => {
+          if (board.workspaceId && workspace._id) {
+            return board.workspaceId.toString() === workspace._id.toString()
+          }
+        })
+      }
+    })
+    console.log(111)
+    console.log(joinedWorkspaces)
+    return joinedWorkspaces
   } catch (error) {
-    throw new Error(error)
+    throw new Error(error.message)
   }
 }
+
 const findAllBoardForWorkspace = async (workspaceId) => {
   try {
     const result = await GET_DB()

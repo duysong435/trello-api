@@ -9,7 +9,6 @@ const getAllWorkspaceForUser = async (req, res, next) => {
   }
 }
 const updateLogoForWorkspace = async (req, res, next) => {
-  console.log(2222)
   const workspaceId = req.workspaceId
   const newLogo = req.newLogo
   const result = await workspaceModel.updateLogoForWorkspace(workspaceId, newLogo)
